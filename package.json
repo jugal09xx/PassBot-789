@@ -1,0 +1,19 @@
+{
+  "name": "secure-password-manager-789",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "author": "Jugal Lad",
+  "license": "ISC",
+  "dependencies": {
+    "clipboardy": "^4.0.0",
+    "csv-parser": "^3.0.0",
+    "figlet": "^1.7.0",
+    "inquirer": "^9.2.12"
+  }
+}
