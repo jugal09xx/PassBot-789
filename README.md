@@ -48,7 +48,7 @@ PassBot-789 is a secure password manager designed for the CMPT-789 Applied Crypt
 
 ## Video Demo
 
-(Watch the demo here)[https://drive.google.com/file/d/1NWT97XMXDrgCZ5dDHViEG1uHCum6wMiT/view?usp=sharing]
+[Watch the demo here](https://drive.google.com/file/d/1NWT97XMXDrgCZ5dDHViEG1uHCum6wMiT/view?usp=sharing)
 
 ## License
 This project is licensed under the [MIT License](LICENSE).
