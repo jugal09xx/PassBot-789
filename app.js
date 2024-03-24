@@ -5,6 +5,7 @@ import crypto from "crypto";
 import clipboardy from "clipboardy";
 import figlet from "figlet";
 
+
 // Initialize the application
 welcomeMenu();
 
@@ -13,6 +14,9 @@ let masterPassword;
 let currentIV;
 let currentDB;
 let entries = [];
+
+// Newly added, imageHash variable
+let imageHash;
 
 // Encryption function to encrypt data
 function encrypt(data, masterPassword) {
@@ -83,6 +87,48 @@ function decrypt(data, masterPassword, iv) {
   return decrypted;
 }
 
+// Newly added, function to hash image
+function hashImage(imageBuffer) {
+  const hash = crypto.createHash('sha256');
+  hash.update(imageBuffer);
+  return hash.digest('hex');
+}
+
+// Newly added, function for image upload
+async function imageUpload() {
+  const { imagePath } = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'imagePath',
+      message: "Please enter the image path to finish upload:",
+      validate: input => {
+
+        if (fs.existsSync(input)) {
+          return true;
+        }
+        return 'The file path does not exist. Please enter a vlid path.'
+      }
+    },
+  ]);
+
+    // Read the image file from the provided path
+    try {
+      const imageBuffer = fs.readFileSync(imagePath);
+      imageHash = hashImage(imageBuffer);
+
+      // To be deleted, for testing purpose only
+      console.log("Hash: ", imageHash);
+
+      console.log('The image has been processed successfully.');
+      return imageHash; // The hashed image data can be used as a salt
+    } catch (error) {
+      console.error('An error occurred while processing the image:', error);
+      throw error; // Rethrow the error for the caller to handle
+    }
+
+  } // End of imageUpload()
+
+
 // Main menu for the application
 async function welcomeMenu() {
   //console.log();
@@ -91,7 +137,7 @@ async function welcomeMenu() {
       type: "list",
       name: "choice",
       message: "PassBot-789 - A Secure Password Manager",
-      choices: ["Open Existing Database", "Create New Database", "Exit"],
+      choices: ["Open Existing Database", "Create New Database", "Image Upload","Exit"],
     },
   ]);
 
@@ -104,6 +150,9 @@ async function welcomeMenu() {
       break;
     case "Exit":
       console.log("Exiting...");
+      break;
+    case "Image Upload":
+      await imageUpload();
       break;
     default:
       console.log("Invalid choice!");
@@ -294,6 +343,13 @@ async function viewEntries() {
   }
 }
 
+
+// Newly added, function to hash and combine the master password and image hash
+function createPasswordHash(masterPassword, imageHash) {
+  const combined = masterPassword + imageHash;
+  return crypto.createHash('sha256').update(combined).digest('hex');
+}
+
 // Function to add a new entry
 async function addEntry() {
   const { title, userName, useRandomPassword, password } =
@@ -324,6 +380,7 @@ async function addEntry() {
 
   let newPassword = password;
 
+  // Generate random password
   if (useRandomPassword) {
     const length = 16
     const charset =
