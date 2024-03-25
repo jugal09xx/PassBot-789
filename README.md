@@ -46,6 +46,10 @@ PassBot-789 is a secure password manager designed for the CMPT-789 Applied Crypt
 - **Key Derivation Function**: SHA-256 hash of the master password 
 - **Initialization Vector (IV)**: Randomly generated for each new database file created
 
+## Video Demo
+
+[Watch the demo here](https://drive.google.com/file/d/1NWT97XMXDrgCZ5dDHViEG1uHCum6wMiT/view?usp=sharing)
+
 ## License
 This project is licensed under the [MIT License](LICENSE).
 
