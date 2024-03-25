@@ -3,7 +3,6 @@ import inquirer from "inquirer";
 import fs from "fs";
 import crypto from "crypto";
 import clipboardy from "clipboardy";
-import figlet from "figlet";
 
 
 // Initialize the application
@@ -17,10 +16,13 @@ let entries = [];
 
 // Newly added, imageHash variable
 let imageHash;
+// New gloabl variable for image path
+let imagePath;
 
 // Encryption function to encrypt data
 function encrypt(data, masterPassword) {
   const key = crypto.createHash("sha256").update(masterPassword).digest("hex");
+  console.log("key: (MasPswd + img) "+key)
   const iv = crypto.randomBytes(16);
   currentIV = iv;
   const cipher = crypto.createCipheriv(
@@ -87,6 +89,29 @@ function decrypt(data, masterPassword, iv) {
   return decrypted;
 }
 
+//Newer function to return image hash from image path
+function getImgHash(imagePath) {
+
+  // Read the image file from the provided path
+  if (fs.existsSync(imagePath)) {
+    try {
+      const imageBuffer = fs.readFileSync(imagePath);
+      imageHash = hashImage(imageBuffer);
+  
+      // To be deleted, for testing purpose only
+      console.log("Hash: ", imageHash);
+  
+      console.log('The image has been processed successfully.');
+      return imageHash; // The hashed image data can be used as a salt
+    } catch (error) {
+      console.error('An error occurred while processing the image:', error);
+      throw error; // Rethrow the error for the caller to handle
+    }
+  }
+  return 'The file path does not exist. Please enter a valid path.'
+
+}
+
 // Newly added, function to hash image
 function hashImage(imageBuffer) {
   const hash = crypto.createHash('sha256');
@@ -94,39 +119,39 @@ function hashImage(imageBuffer) {
   return hash.digest('hex');
 }
 
-// Newly added, function for image upload
-async function imageUpload() {
-  const { imagePath } = await inquirer.prompt([
-    {
-      type: 'input',
-      name: 'imagePath',
-      message: "Please enter the image path to finish upload:",
-      validate: input => {
+// // Newly added, function for image upload
+// async function imageUpload() {
+//   const { imagePath } = await inquirer.prompt([
+//     {
+//       type: 'input',
+//       name: 'imagePath',
+//       message: "Please enter the image path to finish upload:",
+//       validate: input => {
 
-        if (fs.existsSync(input)) {
-          return true;
-        }
-        return 'The file path does not exist. Please enter a vlid path.'
-      }
-    },
-  ]);
+//         if (fs.existsSync(input)) {
+//           return true;
+//         }
+//         return 'The file path does not exist. Please enter a vlid path.'
+//       }
+//     },
+//   ]);
 
-    // Read the image file from the provided path
-    try {
-      const imageBuffer = fs.readFileSync(imagePath);
-      imageHash = hashImage(imageBuffer);
+//     // Read the image file from the provided path
+//     try {
+//       const imageBuffer = fs.readFileSync(imagePath);
+//       imageHash = hashImage(imageBuffer);
 
-      // To be deleted, for testing purpose only
-      console.log("Hash: ", imageHash);
+//       // To be deleted, for testing purpose only
+//       console.log("Hash: ", imageHash);
 
-      console.log('The image has been processed successfully.');
-      return imageHash; // The hashed image data can be used as a salt
-    } catch (error) {
-      console.error('An error occurred while processing the image:', error);
-      throw error; // Rethrow the error for the caller to handle
-    }
+//       console.log('The image has been processed successfully.');
+//       return imageHash; // The hashed image data can be used as a salt
+//     } catch (error) {
+//       console.error('An error occurred while processing the image:', error);
+//       throw error; // Rethrow the error for the caller to handle
+//     }
 
-  } // End of imageUpload()
+//   } // End of imageUpload()
 
 
 // Main menu for the application
@@ -163,10 +188,11 @@ async function welcomeMenu() {
 // Function to create a new password database
 async function createDatabase() {
   masterPassword = "";
+  imagePath =  "";
   currentIV = "";
   currentDB = "";
   entries = [];
-  const { dbName, masterPassword: userMasterPassword } = await inquirer.prompt([
+  const { dbName, masterPassword: userMasterPassword, imagePath: userImagePath } = await inquirer.prompt([
     {
       type: "input",
       name: "dbName",
@@ -177,9 +203,15 @@ async function createDatabase() {
       name: "masterPassword",
       message: "Set a new master password: ",
     },
+    {
+      type: "input",
+      name: "imagePath",
+      message: "Enter image path: ",
+    },
   ]);
 
   masterPassword = userMasterPassword;
+  imagePath = userImagePath;
 
   if (!masterPassword || !dbName) {
     console.log("Master password cannot be empty.");
@@ -191,7 +223,10 @@ async function createDatabase() {
   const title = "test";
   entries.push({ title, username, password });
   currentDB = dbName;
-  createCSVandEncrypt(dbName, entries, masterPassword);
+  imageHash = getImgHash(imagePath);
+  console.log("img hash: "+imageHash)
+  let combinedHash = masterPassword + imageHash
+  createCSVandEncrypt(dbName, entries, combinedHash);
 }
 
 // Function to open an existing password database
