@@ -100,7 +100,7 @@ async function welcomeMenu() {
       await createDatabase();
       break;
     case "Open Existing Database":
-      await openDatabse();
+      await openDatabase();
       break;
     case "Exit":
       console.log("Exiting...");
@@ -146,7 +146,7 @@ async function createDatabase() {
 }
 
 // Function to open an existing password database
-async function openDatabse() {
+async function openDatabase() {
   masterPassword = "";
   currentIV = "";
   currentDB = "";
@@ -324,6 +324,7 @@ async function addEntry() {
 
   let newPassword = password;
 
+  //generate random password:
   if (useRandomPassword) {
     const length = 16
     const charset =
