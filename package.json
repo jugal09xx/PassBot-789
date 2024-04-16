@@ -11,11 +11,14 @@
   "author": "Jugal Lad",
   "license": "ISC",
   "dependencies": {
+    "argon2": "^0.40.1",
     "base85": "^3.1.0",
     "clipboardy": "^4.0.0",
     "csv-parser": "^3.0.0",
+    "dotenv": "^16.4.5",
     "figlet": "^1.7.0",
     "fs": "^0.0.1-security",
-    "inquirer": "^9.2.15"
+    "inquirer": "^9.2.15",
+    "mysql2": "^3.9.4"
   }
 }
